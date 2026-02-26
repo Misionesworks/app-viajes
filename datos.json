@@ -1,0 +1,12 @@
+[
+  "PrimerViaje",
+  "ReflexionProfunda",
+  "PrimerViaje",
+  "PrimerViaje",
+  {
+    "ciudad": "Rio",
+    "tipo": "Hostel",
+    "precio": 30,
+    "comentario": "Bueno"
+  }
+]
