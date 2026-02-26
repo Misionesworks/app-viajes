@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard de Viajes</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="p-4">
+  <div class="container">
+    <h1 class="mb-4">Dashboard de Viajes</h1>
+
+    <!-- Formulario para agregar viaje -->
+    <div class="card mb-4 p-3">
+      <h5>Agregar viaje</h5>
+      <form id="formAgregar">
+        <div class="row g-2">
+          <div class="col-md-3">
+            <input type="text" id="ciudad" class="form-control" placeholder="Ciudad" required>
+          </div>
+          <div class="col-md-3">
+            <input type="text" id="tipo" class="form-control" placeholder="Tipo (Hostel, Hotel, etc.)" required>
+          </div>
+          <div class="col-md-2">
+            <input type="number" id="precio" class="form-control" placeholder="Precio" required>
+          </div>
+          <div class="col-md-4">
+            <input type="text" id="comentario" class="form-control" placeholder="Comentario (opcional)">
+          </div>
+        </div>
+        <button class="btn btn-primary mt-2" type="submit">Guardar viaje</button>
+      </form>
+      <div id="mensaje" class="mt-2"></div>
+    </div>
+
+    <!-- Filtro por ciudad -->
+    <div class="mb-3">
+      <input type="text" id="filtroCiudad" class="form-control" placeholder="Filtrar por ciudad">
+    </div>
+
+    <!-- Tabla de registros -->
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Ciudad</th>
+          <th>Tipo</th>
+          <th>Precio</th>
+          <th>Comentario</th>
+        </tr>
+      </thead>
+      <tbody id="tablaBody">
+        <!-- Registros se insertan aquí -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    async function cargarRegistros(ciudadFiltro = '') {
+      let url = '/ver';
+      if (ciudadFiltro) url = `/filtrar?ciudad=${ciudadFiltro}`;
+      const res = await fetch(url);
+      const datos = await res.json();
+
+      const tbody = document.getElementById('tablaBody');
+      tbody.innerHTML = '';
+
+      datos.forEach(reg => {
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+          <td>${reg.id}</td>
+          <td>${reg.ciudad}</td>
+          <td>${reg.tipo}</td>
+          <td>${reg.precio}</td>
+          <td>${reg.comentario || ''}</td>
+        `;
+        tbody.appendChild(fila);
+      });
+    }
+
+    document.getElementById('filtroCiudad').addEventListener('input', e => {
+      cargarRegistros(e.target.value);
+    });
+
+    document.getElementById('formAgregar').addEventListener('submit', async e => {
+      e.preventDefault();
+      const ciudad = document.getElementById('ciudad').value;
+      const tipo = document.getElementById('tipo').value;
+      const precio = document.getElementById('precio').value;
+      const comentario = document.getElementById('comentario').value;
+
+      const params = new URLSearchParams({ ciudad, tipo, precio, comentario });
+      const res = await fetch(`/guardar?${params.toString()}`);
+      const mensaje = await res.text();
+
+      document.getElementById('mensaje').textContent = mensaje;
+      e.target.reset();
+      cargarRegistros();
+    });
+
+    cargarRegistros();
+  </script>
+</body>
+</html>
